@@ -184,7 +184,7 @@ struct tree {
         return find_left(static_cast<node<left_t, right_t> * >(_ptr->left_left), val);
     }
 
-    node<left_t, right_t> *find_right(node<left_t, right_t> *_ptr, left_t const &val) {
+    node<left_t, right_t> *find_right(node<left_t, right_t> *_ptr, right_t const &val) {
         if (_ptr == nullptr || val == _ptr->right_data) {
             return _ptr;
         }
@@ -213,14 +213,17 @@ struct tree {
         return tmp;
     }
 
-    void eraseNode_left(base_node<left_t, right_t> *_ptr) {
+    void eraseNode_left(base_node<left_t, right_t> *&_ptr) {
         if (_ptr->left_left != nullptr && _ptr->left_right != nullptr) {
             base_node<left_t, right_t> *tmp = _ptr->left_right;
             while (tmp->left_left != nullptr) {
                 tmp = tmp->left_left;
             }
             if (tmp->left_parent != _ptr) {
-                tmp->left_parent->left_left = nullptr;
+                tmp->left_parent->left_left = tmp->left_right;
+                if (tmp->left_right != nullptr) {
+                    tmp->left_right->left_parent = tmp->left_parent;
+                }
                 tmp->left_parent = _ptr->left_parent;
                 tmp->left_right = _ptr->left_right;
             } else {
@@ -266,14 +269,17 @@ struct tree {
         _ptr->left_right = nullptr;
     }
 
-    void eraseNode_right(base_node<left_t, right_t> *_ptr) {
+    void eraseNode_right(base_node<left_t, right_t> *&_ptr) {
         if (_ptr->right_left != nullptr && _ptr->right_right != nullptr) {
             base_node<left_t, right_t> *tmp = _ptr->right_right;
             while (tmp->right_left != nullptr) {
                 tmp = tmp->right_left;
             }
             if (tmp->right_parent != _ptr) {
-                tmp->right_parent->right_left = nullptr;
+                tmp->right_parent->right_left = tmp->right_right;
+                if (tmp->right_right != nullptr) {
+                    tmp->right_right->right_parent = tmp->right_parent;
+                }
                 tmp->right_parent = _ptr->right_parent;
                 tmp->right_right = _ptr->right_right;
             } else {
@@ -322,17 +328,7 @@ struct tree {
     void erase(base_node<left_t, right_t>* _ptr) {
         eraseNode_left(_ptr);
         eraseNode_right(_ptr);
-        delete(_ptr);
-    }
-
-    void print_l(node<left_t, right_t> *p) {
-        if (p->right_left != nullptr) {
-            print_l(static_cast<node<left_t, right_t> * >(p->right_left));
-        }
-        std::cout << p->right_data << ' ';
-        if (p->right_right != nullptr) {
-            print_l(static_cast<node<left_t, right_t> * >(p->right_right));
-        }
+        delete(static_cast<node<left_t, right_t>*>(_ptr));
     }
 };
 
@@ -541,6 +537,5 @@ public:
         return right_iterator(_tree->root);
     }
 };
-
 
 #endif //BIGINT_BIMAP_H
