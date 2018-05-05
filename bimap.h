@@ -124,7 +124,7 @@ struct tree {
             elem->left_parent = root;
 
         }
-        node<left_t, right_t> *tmp = static_cast<node<left_t, right_t>* >(root->left_left);
+        node<left_t, right_t> *tmp = static_cast<node<left_t, right_t> * >(root->left_left);
         left_t eval = elem->left_data;
         while (tmp != nullptr) {
             left_t val = tmp->left_data;
@@ -134,14 +134,14 @@ struct tree {
                     elem->left_parent = tmp;
                     return;
                 }
-                tmp = static_cast<node<left_t, right_t>* >(tmp->left_right);
+                tmp = static_cast<node<left_t, right_t> * >(tmp->left_right);
             } else {
                 if (tmp->left_left == nullptr) {
                     tmp->left_left = elem;
                     elem->left_parent = tmp;
                     return;
                 }
-                tmp = static_cast<node<left_t, right_t>* >(tmp->left_left);
+                tmp = static_cast<node<left_t, right_t> * >(tmp->left_left);
             }
         }
     }
@@ -152,7 +152,7 @@ struct tree {
             elem->right_parent = root;
 
         }
-        node<left_t, right_t> *tmp = static_cast<node<left_t, right_t>* >(root->right_left);
+        node<left_t, right_t> *tmp = static_cast<node<left_t, right_t> * >(root->right_left);
         right_t eval = elem->right_data;
         while (tmp != nullptr) {
             right_t val = tmp->right_data;
@@ -162,14 +162,14 @@ struct tree {
                     elem->right_parent = tmp;
                     return;
                 }
-                tmp = static_cast<node<left_t, right_t>* >(tmp->right_right);
+                tmp = static_cast<node<left_t, right_t> * >(tmp->right_right);
             } else {
                 if (tmp->right_left == nullptr) {
                     tmp->right_left = elem;
                     elem->right_parent = tmp;
                     return;
                 }
-                tmp = static_cast<node<left_t, right_t>* >(tmp->right_left);
+                tmp = static_cast<node<left_t, right_t> * >(tmp->right_left);
             }
         }
     }
@@ -179,9 +179,9 @@ struct tree {
             return _ptr;
         }
         if (val > _ptr->left_data) {
-            return find_left(static_cast<node<left_t, right_t>* >(_ptr->left_right), val);
+            return find_left(static_cast<node<left_t, right_t> * >(_ptr->left_right), val);
         }
-        return find_left(static_cast<node<left_t, right_t>* >(_ptr->left_left), val);
+        return find_left(static_cast<node<left_t, right_t> * >(_ptr->left_left), val);
     }
 
     node<left_t, right_t> *find_right(node<left_t, right_t> *_ptr, left_t const &val) {
@@ -189,9 +189,9 @@ struct tree {
             return _ptr;
         }
         if (val > _ptr->right_data) {
-            return find_right(static_cast<node<left_t, right_t>* >(_ptr->right_right), val);
+            return find_right(static_cast<node<left_t, right_t> * >(_ptr->right_right), val);
         }
-        return find_right(static_cast<node<left_t, right_t>* >(_ptr->right_left), val);
+        return find_right(static_cast<node<left_t, right_t> * >(_ptr->right_left), val);
     }
 
     node<left_t, right_t> *insert(left_t const &valL, right_t const &valR) {
@@ -203,8 +203,9 @@ struct tree {
             tmp->right_parent = root;
             return tmp;
         }
-        if (find_left(static_cast<node<left_t, right_t>* >(root->left_left), valL) != nullptr || find_right(static_cast<node<left_t, right_t>* >(root->right_left), valR) != nullptr) {
-            return static_cast<node<left_t, right_t>* >(root);
+        if (find_left(static_cast<node<left_t, right_t> * >(root->left_left), valL) != nullptr ||
+            find_right(static_cast<node<left_t, right_t> * >(root->right_left), valR) != nullptr) {
+            return static_cast<node<left_t, right_t> * >(root);
         }
         node<left_t, right_t> *tmp = new node<left_t, right_t>(valL, valR);
         insert_left(tmp);
@@ -212,13 +213,125 @@ struct tree {
         return tmp;
     }
 
-    void print_l(node<left_t, right_t>* p) {
+    void eraseNode_left(base_node<left_t, right_t> *_ptr) {
+        if (_ptr->left_left != nullptr && _ptr->left_right != nullptr) {
+            base_node<left_t, right_t> *tmp = _ptr->left_right;
+            while (tmp->left_left != nullptr) {
+                tmp = tmp->left_left;
+            }
+            if (tmp->left_parent != _ptr) {
+                tmp->left_parent->left_left = nullptr;
+                tmp->left_parent = _ptr->left_parent;
+                tmp->left_right = _ptr->left_right;
+            } else {
+                tmp->left_parent = _ptr->left_parent;
+            }
+            tmp->left_left = _ptr->left_left;
+            if (tmp->left_right != nullptr) {
+                tmp->left_right->left_parent = tmp;
+            }
+            if (tmp->left_left != nullptr) {
+                tmp->left_left->left_parent = tmp;
+            }
+            if (_ptr == _ptr->left_parent->left_left) {
+                _ptr->left_parent->left_left = tmp;
+            } else {
+                _ptr->left_parent->left_right = tmp;
+            }
+        } else if (_ptr->left_right != nullptr) {
+            base_node<left_t, right_t> *tmp = _ptr->left_right;
+            tmp->left_parent = _ptr->left_parent;
+            if (_ptr == _ptr->left_parent->left_left) {
+                _ptr->left_parent->left_left = tmp;
+            } else {
+                _ptr->left_parent->left_right = tmp;
+            }
+        } else if (_ptr->left_left != nullptr) {
+            base_node<left_t, right_t> *tmp = _ptr->left_left;
+            tmp->left_parent = _ptr->left_parent;
+            if (_ptr == _ptr->left_parent->left_left) {
+                _ptr->left_parent->left_left = tmp;
+            } else {
+                _ptr->left_parent->left_right = tmp;
+            }
+        } else {
+            if (_ptr == _ptr->left_parent->left_left) {
+                _ptr->left_parent->left_left = nullptr;
+            } else {
+                _ptr->left_parent->left_right = nullptr;
+            }
+        }
+        _ptr->left_parent = nullptr;
+        _ptr->left_left = nullptr;
+        _ptr->left_right = nullptr;
+    }
+
+    void eraseNode_right(base_node<left_t, right_t> *_ptr) {
+        if (_ptr->right_left != nullptr && _ptr->right_right != nullptr) {
+            base_node<left_t, right_t> *tmp = _ptr->right_right;
+            while (tmp->right_left != nullptr) {
+                tmp = tmp->right_left;
+            }
+            if (tmp->right_parent != _ptr) {
+                tmp->right_parent->right_left = nullptr;
+                tmp->right_parent = _ptr->right_parent;
+                tmp->right_right = _ptr->right_right;
+            } else {
+                tmp->right_parent = _ptr->right_parent;
+            }
+            tmp->right_left = _ptr->right_left;
+            if (tmp->right_right != nullptr) {
+                tmp->right_right->right_parent = tmp;
+            }
+            if (tmp->right_left != nullptr) {
+                tmp->right_left->right_parent = tmp;
+            }
+            if (_ptr == _ptr->right_parent->right_left) {
+                _ptr->right_parent->right_left = tmp;
+            } else {
+                _ptr->right_parent->right_right = tmp;
+            }
+        } else if (_ptr->right_right != nullptr) {
+            base_node<left_t, right_t> *tmp = _ptr->right_right;
+            tmp->right_parent = _ptr->right_parent;
+            if (_ptr == _ptr->right_parent->right_left) {
+                _ptr->right_parent->right_left = tmp;
+            } else {
+                _ptr->right_parent->right_right = tmp;
+            }
+        } else if (_ptr->right_left != nullptr) {
+            base_node<left_t, right_t> *tmp = _ptr->right_left;
+            tmp->right_parent = _ptr->right_parent;
+            if (_ptr == _ptr->right_parent->right_left) {
+                _ptr->right_parent->right_left = tmp;
+            } else {
+                _ptr->right_parent->right_right = tmp;
+            }
+        } else {
+            if (_ptr == _ptr->right_parent->right_left) {
+                _ptr->right_parent->right_left = nullptr;
+            } else {
+                _ptr->right_parent->right_right = nullptr;
+            }
+        }
+        _ptr->right_parent = nullptr;
+        _ptr->right_left = nullptr;
+        _ptr->right_right = nullptr;
+    }
+
+    void erase(base_node<left_t, right_t>* _ptr) {
+        eraseNode_left(_ptr);
+        eraseNode_right(_ptr);
+        delete(_ptr);
+    }
+
+    void print_l(node<left_t, right_t> *p) {
         if (p->right_left != nullptr) {
-            print_l(static_cast<node<left_t, right_t>* >(p->right_left));
+            print_l(static_cast<node<left_t, right_t> * >(p->right_left));
         }
         std::cout << p->right_data << ' ';
         if (p->right_right != nullptr) {
-            print_l(static_cast<node<left_t, right_t>* >(p->right_right));
+            print_l(static_cast<node<left_t, right_t> * >(p->right_right));
         }
     }
 };
@@ -366,7 +479,12 @@ public:
 
     bimap &operator=(bimap const &) = delete;
 
-    ~bimap(){};
+    ~bimap() {
+        while (begin_left() != end_left()) {
+            erase(begin_left());
+        }
+        delete(_tree);
+    }
 
     left_iterator insert(left_t const &left, right_t const &right) {
         left_iterator a = left_iterator(_tree->insert(left, right));
@@ -375,32 +493,53 @@ public:
         return a;
     }
 
-    // Удаляет элемент и соответствующий ему парный.
-    // erase невалидного итератора неопределен.
-    // erase(end_left()) и erase(end_right()) неопределены.
-    // Пусть it ссылается на некоторый элемент e.
-    // erase инвалидирует все итераторы ссылающиеся на e и на элемент парный к e.
-    void erase(left_iterator it);
+    void erase(left_iterator it) {
+        _tree->erase(it.ptr);
+    }
 
-    void erase(right_iterator it);
+    void erase(right_iterator it) {
+        _tree->erase(it.ptr);
+    }
 
-    // Возвращает итератор по элементу. В случае если элемент не найден, возвращает
-    // end_left()/end_right() соответственно.
-    left_iterator find_left(left_t const &left) const;
+    left_iterator find_left(left_t const &left) const {
+        node<left_t, right_t>* ans = _tree->find_left(static_cast<node<left_t, right_t>*>(_tree->root->left_left), left);
+        if (ans == nullptr) {
+            return left_iterator(_tree->root);
+        }
+        return left_iterator(static_cast<base_node<left_t, right_t>*>(ans));
+    }
 
-    right_iterator find_right(right_t const &right) const;
+    right_iterator find_right(right_t const &right) const {
+        node<left_t, right_t>* ans = _tree->find_right(static_cast<node<left_t, right_t>*>(_tree->root->right_left), right);
+        if (ans == nullptr) {
+            return right_iterator(_tree->root);
+        }
+        return right_iterator(static_cast<base_node<left_t, right_t>*>(ans));
+    }
 
-    // Возващает итератор на минимальный по величине left.
-    left_iterator begin_left() const;
+    left_iterator begin_left() const {
+        base_node<left_t, right_t>* ans = _tree->root;
+        while (ans->left_left != nullptr) {
+            ans = ans->left_left;
+        }
+        return left_iterator(ans);
+    }
 
-    // Возващает итератор на следующий за последним по величине left.
-    left_iterator end_left() const;
+    left_iterator end_left() const {
+        return left_iterator(_tree->root);
+    }
 
-    // Возващает итератор на минимальный по величине right.
-    right_iterator begin_right() const;
+    right_iterator begin_right() const{
+        base_node<left_t, right_t>* ans = _tree->root;
+        while (ans->right_left != nullptr) {
+            ans = ans->right_left;
+        }
+        return right_iterator(ans);
+    }
 
-    // Возващает итератор на следующий за последним по величине right.
-    right_iterator end_right() const;
+    right_iterator end_right() const {
+        return right_iterator(_tree->root);
+    }
 };
 
 
